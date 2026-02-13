@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本全国 花の見頃マップ</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+#map {
+    height: 90vh;
+    width: 100%;
+}
+
+header {
+    padding: 10px;
+    background: #ff69b4;
+    color: white;
+    text-align: center;
+}
+
+select {
+    padding: 8px;
+    margin-top: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>🌸 日本全国 花の見頃マップ</h2>
+    <select id="flowerFilter" onchange="filterFlowers()">
+        <option value="all">すべて表示</option>
+        <option value="桜">桜</option>
+        <option value="梅">梅</option>
+        <option value="ネモフィラ">ネモフィラ</option>
+        <option value="ラベンダー">ラベンダー</option>
+        <option value="ひまわり">ひまわり</option>
+    </select>
+</header>
+
+<div id="map"></div>
+
+<script>
+let map;
+let markers = [];
+
+const flowerSpots = [
+    {
+        name: "弘前公園",
+        lat: 40.6032,
+        lng: 140.4648,
+        flower: "桜",
+        season: "4月",
+        image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Hirosaki_Castle_and_sakura.jpg"
+    },
+    {
+        name: "偕楽園",
+        lat: 36.3789,
+        lng: 140.4556,
+        flower: "梅",
+        season: "3月",
+        image: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Kairakuen_Ume.jpg"
+    },
+    {
+        name: "国営ひたち海浜公園",
+        lat: 36.4053,
+        lng: 140.5970,
+        flower: "ネモフィラ",
+        season: "4〜5月",
+        image: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Nemophila_Hitachi.jpg"
+    },
+    {
+        name: "富良野",
+        lat: 43.3425,
+        lng: 142.3832,
+        flower: "ラベンダー",
+        season: "7月",
+        image: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Furano_Lavender.jpg"
+    },
+    {
+        name: "明野ひまわり畑",
+        lat: 35.8335,
+        lng: 138.3915,
+        flower: "ひまわり",
+        season: "8月",
+        image: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Himawari_Field.jpg"
+    }
+];
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 5,
+        center: { lat: 36.2048, lng: 138.2529 }
+    });
+
+    displayMarkers(flowerSpots);
+}
+
+function displayMarkers(spots) {
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+
+    spots.forEach(spot => {
+        const marker = new google.maps.Marker({
+            position: { lat: spot.lat, lng: spot.lng },
+            map: map,
+            title: spot.name
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <h3>${spot.name}</h3>
+                <p>花：${spot.flower}</p>
+                <p>見頃：${spot.season}</p>
+                <img src="${spot.image}" width="200">
+            `
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+        });
+
+        markers.push(marker);
+    });
+}
+
+function filterFlowers() {
+    const selected = document.getElementById("flowerFilter").value;
+    if (selected === "all") {
+        displayMarkers(flowerSpots);
+    } else {
+        const filtered = flowerSpots.filter(spot => spot.flower === selected);
+        displayMarkers(filtered);
+    }
+}
+</script>
+
+<script async
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap">
+</script>
+
+</body>
+</html>
